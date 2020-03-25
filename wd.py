@@ -456,6 +456,7 @@ class Model:
         alarm_time = 30 * self.NLC
         while len(res_list) < 5 and alarm_time <= 120 * self.NLC:
             for q in q_array:
+                print("q: {0:.1f}".format(q))
                 if q not in q_list:
                     if self.run_dc(q, alarm_time=alarm_time):
                         res = self.read_dcout()

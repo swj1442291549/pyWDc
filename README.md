@@ -68,18 +68,16 @@ The output of the code will be saved at `result/{output_folder}/{directory}.pkl`
 
 The code use distance modulus, `dm`, to derive the absolute parameters. If you don't have that info (or not interested), it can be set to any arbitary value. 
 
-The method `correct_temp_comb` is implemented to account for the possible bias when using combined temperature as primary temperature. Check the paper for more details.
+The method `mod.correct_temp_comb()` is implemented to account for the possible bias when using combined temperature as primary temperature. Check the paper for more details.
 
 
 ## Test Case
 
-See file test.py
+See file `test.py`
 
-In this test case, I use `mod.cal_res_curve_test` instead of `mod.cal_res_curve` to save some time. A full iteration over mass-ratio could be time-consuming, thus only 10 mass-ratio values are calculated here.
+In this test case, I use `mod.cal_res_curve_test()` instead of `mod.cal_res_curve()` to save some time. A full iteration over mass-ratio could be time-consuming, thus only 10 mass-ratio values are calculated here.
 
-You can use `mod.print_info()` to check the best-fitting parameters.
-
-The output figure for this test case is in `test/output.pdf`.
+You can use `mod.print_info()` to check the best-fitting parameters. The output figure for this test case is in `test/output.pdf` (using `mod.cal_res_curve()`).
 
 
 ## Problems
