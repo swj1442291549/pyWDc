@@ -73,7 +73,7 @@ The method `mod.correct_temp_comb()` is implemented to account for the possible 
 
 ## Test Case
 
-See file `test.py`
+See file `test.py`.
 
 In this test case, I use `mod.cal_res_curve_test()` instead of `mod.cal_res_curve()` to save some time. A full iteration over mass-ratio could be time-consuming, thus only 10 mass-ratio values are calculated here.
 
