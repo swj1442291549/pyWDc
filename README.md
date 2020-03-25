@@ -72,27 +72,10 @@ The method `correct_temp_comb` is implemented to account for the possible bias w
 
 
 ## Test Case
-```python
-lc_data = pd.read_csv("test/testdata.csv")
-lc = LC(
-    lc_data, IBAND=7, WLA=0.551, AEXTINC=0.14, CALIB=0.36895
-)
-mod = Model([lc], "test", PERIOD=0.372382, TAVH=0.571711)
-mod.prepare_run()
-mod.clean_lc_gp()
-mod.cal_res_curve()
-try:
-    mod.find_q_best()
-    mod.cal_bol_mag_abs(dm=9.476)
-    mod.correct_temp_comb()
-    mod.cal_bol_mag_abs(dm=9.476)
-except:
-    pass
-else:
-    mod.cal_fit()
-    mod.save(output_folder)
-mod.clean_run()
-```
+
+See file test.py
+
+In this test case, I use `mod.cal_res_curve_test` instead of `mod.cal_res_curve` to save some time. A full iteration over mass-ratio could be time-consuming, thus only 10 mass-ratio values are calculated here.
 
 You can use `mod.print_info()` to check the best-fitting parameters.
 
