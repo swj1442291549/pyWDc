@@ -64,7 +64,9 @@ else:
 mod.clean_run()
 ```
 
-The output of the code will be saved at `result/{output_folder}/{directory}.pkl`. The previous code also generate best-fitting light curve models and residue curves in `fig/{output_folder}/{directory}_lc.pdf` and `fig/{output_folder}/{directory}_res.pdf`. You can comment `plot_lc` and `plot_res` out if you don't want them.
+The output of the code will be saved at `result/{output_folder}/{directory}.pkl` as a pickle file. The previous code also generate best-fitting light curve models and residue curves in `fig/{output_folder}/{directory}_lc.pdf` and `fig/{output_folder}/{directory}_res.pdf`. You can comment `plot_lc` and `plot_res` out if you don't want them.
+
+To read the pickle file, please use `mod = Model.load({directory}, {output_folder})`.
 
 The code use distance modulus, `dm`, to derive the absolute parameters. If you don't have that info (or not interested), it can be set to any arbitary value. 
 
