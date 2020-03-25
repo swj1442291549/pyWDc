@@ -12,7 +12,6 @@ python wd.py
 ```
 to compile the WD code for your machine.
 
-
 ## Prepare the data
 You need to prepare the dataframe yourself. 
 
@@ -20,6 +19,7 @@ The mimumum requirements are "phase"/"jd" and "mag". If you have the information
 
 After that, generate a `LC` class:
 ```python
+from wd import LC
 lc = LC(mydata, IBAND, WLA, AEXTINC, CALIB)
 ```
 in which,
@@ -36,6 +36,7 @@ lc_list = [lc0, lc1, ...]
 ## Run the WD modeling
 Generate the model based on `lc_list` through
 ```python
+from wd import Model
 mod = Model(lc_list, directory, PERIOD, TAVH)
 ```
 where
