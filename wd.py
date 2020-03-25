@@ -444,6 +444,28 @@ class Model:
             alarm_time *= 2
         self.res = pd.DataFrame({"q": q_list, "res": res_list}).sort_values("q")
 
+    def cal_res_curve_test(self):
+        """Calculate the residual curve for test"""
+        q_array = np.array([0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 3, 5])
+        if hasattr(self, "q"):
+            q_list = list(self.res.q)
+            res_list = list(self.res.res)
+        else:
+            q_list = list()
+            res_list = list()
+        alarm_time = 30 * self.NLC
+        while len(res_list) < 5 and alarm_time <= 120 * self.NLC:
+            for q in q_array:
+                if q not in q_list:
+                    if self.run_dc(q, alarm_time=alarm_time):
+                        res = self.read_dcout()
+                        if not isinstance(res, type(None)):
+                            if not np.isnan(res):
+                                q_list.append(q)
+                                res_list.append(res)
+            alarm_time *= 2
+        self.res = pd.DataFrame({"q": q_list, "res": res_list}).sort_values("q")
+
     def cal_error(self, q):
         if self.run_dc(q, is_rm_fix=False, alarm_time=500):
             with open("run/{0}/dcout.active".format(self.directory), "r") as f:
