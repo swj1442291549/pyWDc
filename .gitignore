@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+material/lcdc
+run
+result
