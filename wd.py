@@ -15,8 +15,7 @@ from scipy.interpolate import interp1d
 from astroML.time_series import MultiTermFit
 
 from sklearn import gaussian_process
-from sklearn.gaussian_process.kernels import (ConstantKernel, Matern,
-                                              WhiteKernel)
+from sklearn.gaussian_process.kernels import ConstantKernel, Matern, WhiteKernel
 
 
 class TimeoutException(Exception):

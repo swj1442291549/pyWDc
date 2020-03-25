@@ -5,9 +5,7 @@ from wd import LC, Model
 if __name__ == "__main__":
     lc_data = pd.read_csv("test/testdata.csv")
     output_folder = "testresult"
-    lc = LC(
-        lc_data, IBAND=7, WLA=0.551, AEXTINC=0.14, CALIB=0.36895
-    )
+    lc = LC(lc_data, IBAND=7, WLA=0.551, AEXTINC=0.14, CALIB=0.36895)
     mod = Model([lc], "test", PERIOD=0.372382, TAVH=0.571711)
     mod.prepare_run()
     mod.clean_lc_gp()
