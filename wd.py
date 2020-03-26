@@ -15,7 +15,8 @@ from scipy.interpolate import interp1d
 from astroML.time_series import MultiTermFit
 
 from sklearn import gaussian_process
-from sklearn.gaussian_process.kernels import ConstantKernel, Matern, WhiteKernel
+from sklearn.gaussian_process.kernels import (ConstantKernel, Matern,
+                                              WhiteKernel)
 
 
 class TimeoutException(Exception):
@@ -79,9 +80,35 @@ class LC:
         if "mag_err" not in self.data.columns:
             self.data = self.data.assign(mag_err=1)
 
+class RV:
+    def __init__(self, data, mntype):
+        """Init
+
+        Args:
+            data (DataFrame): rv data frame
+            mntype (int): Star ID, 1 if same as input temperature in Model
+        """
+        self.data = data
+        self.mntype = mntype
+
+    def cal_phase(self, HJD0, PERIOD):
+        """Calcualte the phase from JD
+
+        Args:
+            HJD0 (float): Ephemeris reference time
+            PERIOD (float): period
+        """
+        phase = np.fmod(self.data.jd - HJD0, PERIOD) / PERIOD
+        self.data = self.data.assign(phase=phase)
+
+    def sort_phase(self):
+        """Sort the order based on phase"""
+        self.data.sort_values("phase", inplace=True)
+        self.data.reset_index(inplace=True, drop=True)
+
 
 class Model:
-    def __init__(self, lc_list, directory, PERIOD, TAVH):
+    def __init__(self, lc_list, directory, PERIOD, TAVH, rv_list=None):
         """Model
 
         Args:
@@ -91,7 +118,16 @@ class Model:
             TAVH (float): Effective temperature in 10000K
         """
         self.lc = lc_list
+        self.rv = rv_list
         self.NLC = len(lc_list)
+        self.IFVC1 = 0
+        self.IFVC2 = 0
+        if self.rv != None:
+            for rv in self.rv:
+                if rv.mntype == 1:
+                    self.IFVC1 = 1
+                else:
+                    self.IFVC2 = 1
         self.PERIOD = PERIOD
         self.temp_color = TAVH
         self.TAVH = TAVH
@@ -114,7 +150,10 @@ class Model:
         if not has_jd:
             self.HJD0 = 50000.0
         else:
-            self.HJD0 = min([min(lc.data.jd) for lc in self.lc])
+            if self.IFVC1 + self.IFVC2 == 0:
+                self.HJD0 = min([min(lc.data.jd) for lc in self.lc])
+            else:
+                self.HJD0 = min([min([min(lc.data.jd) for lc in self.lc]), min([min(rv.data.jd) for rv in self.rv])])
 
     def cal_phase(self):
         """Calculate PHASE"""
@@ -124,6 +163,13 @@ class Model:
             else:
                 lc.cal_phase(self.HJD0, self.PERIOD)
                 lc.sort_phase()
+        if self.IFVC1 + self.IFVC2 != 0:
+            for rv in self.rv:
+                if "phase" in rv.data.columns:
+                    rv.sort_phase()
+                else:
+                    rv.cal_phase(self.HJD0, self.PERIOD)
+                    rv.sort_phase()
 
     def cal_pshift(self):
         """Calculate PSHIFT
@@ -178,7 +224,12 @@ class Model:
 
     def plot_lc(self, save_path=None):
         """Plot the light curve"""
-        fig, ax = plt.subplots()
+        if self.IFVC1 + self.IFVC2 == 0:
+            fig, ax = plt.subplots()
+        else:
+            fig, (ax, ax_rv) = plt.subplots(
+                2, 1, gridspec_kw={"height_ratios": [3, 1]}, sharex=True
+            )
         for lc in self.lc:
             if "flag" not in lc.data.columns:
                 phase = np.concatenate(
@@ -209,8 +260,19 @@ class Model:
         ax.set_xlabel(r"Phase")
         ax.set_ylabel(r"Magnitude (mag)")
         ax.set_xlim(-0.2, 1.2)
-        plt.gca().invert_yaxis()
-        plt.legend()
+        ax.invert_yaxis()
+        ax.legend()
+        if self.IFVC1 + self.IFVC2 != 0:
+            for rv in self.rv:
+                phase = np.concatenate(
+                    [rv.data.phase - 1, rv.data.phase, rv.data.phase + 1]
+                )  # - self.PSHIFT
+                v = np.concatenate([rv.data.v, rv.data.v, rv.data.v])
+                ax_rv.scatter(phase, v, label="{0:d}".format(rv.mntype))
+            ax_rv.set_ylabel(r"$v_r$ (km/s)")
+            ax_rv.set_xlabel(r"Phase")
+            ax_rv.legend()
+            plt.subplots_adjust(hspace=0)
         if save_path:
             p = Path("fig/{0}".format(save_path))
             if not p.is_dir():
