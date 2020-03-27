@@ -394,13 +394,6 @@ class Model:
                         )
                 if j != len(self.lc) - 1:
                     f.write("{0:14.5f}{1:11.6f}{2:8.3f}\n".format(-10001, 0, 0))
-            if self.IFVC1 + self.IFVC2 != 0:
-                f.write("{0:14.5f}{1:11.6f}{2:8.3f}\n".format(-10001, 0, 0))
-                for rv in self.rv:
-                    data_sel = rv.data
-                    for i in range(len(data_sel)):
-                        item = data_sel.iloc[i]
-                        f.write("{0:14.5f}{1:6d}{2:13.5f}\n".format(item.phase, rv.mntype, item.v))
             f.write("  -10001.\n")
             f.write(" 2\n")
 
