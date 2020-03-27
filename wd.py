@@ -393,7 +393,7 @@ class Model:
                             )
                         )
                 if j != len(self.lc) - 1:
-                    f.write("{0:14.5f}{1:11.6f}{2:8.3f}".format(-10001, 0, 0))
+                    f.write("{0:14.5f}{1:11.6f}{2:8.3f}\n".format(-10001, 0, 0))
             if self.IFVC1 + self.IFVC2 != 0:
                 f.write("{0:14.5f}{1:11.6f}{2:8.3f}\n".format(-10001, 0, 0))
                 for rv in self.rv:
