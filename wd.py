@@ -379,6 +379,15 @@ class Model:
             f.write("300.00000\n")
             f.write("300.00000\n")
             f.write("150.\n")
+            for rv in self.rv:
+                for i in range(len(rv.data)):
+                    item = rv.data.iloc[i]
+                    f.write(
+                        "{0:14.5f}{1:11.6f}{2:8.3f}\n".format(
+                            item.phase, item.v, 1 / item.v_err ** 2
+                        )
+                    )
+                f.write("{0:14.5f}{1:11.6f}{2:8.3f}\n".format(-10001, 0, 0))
             for j, lc in enumerate(self.lc):
                 if "flag" not in lc.data.columns:
                     for i in range(len(lc.data)):
