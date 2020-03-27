@@ -268,7 +268,7 @@ class Model:
                     [rv.data.phase - 1, rv.data.phase, rv.data.phase + 1]
                 )  # - self.PSHIFT
                 v = np.concatenate([rv.data.v, rv.data.v, rv.data.v])
-                ax_rv.scatter(phase, v, label="{0:d}".format(rv.mntype))
+                ax_rv.scatter(phase, v, label="{0:d}".format(rv.mntype), s=2)
             ax_rv.set_ylabel(r"$v_r$ (km/s)")
             ax_rv.set_xlabel(r"Phase")
             ax_rv.legend()
@@ -321,7 +321,7 @@ class Model:
                 )
             )  # q, NITERS, XLAMDA, VLR
             f.write("  1  0  2  0\n")
-            f.write("0 0 {0:0>2d} 0 2 0 0 1 1 1 0\n".format(self.NLC))  # NLC
+            f.write("{0:d} {1:d} {2:0>2d} 0 2 0 0 1 1 1 0\n".format(self.IFVC1, self.IFVC2, self.NLC))  # NLC
             f.write("1 1 1 1 1 1 0 -2 -2 0 1 1 0 1 0  0.0000\n")
             f.write(
                 "{0}{1:15.6f}{2:17.10e}  0.000000D+00{3:10.4f} 0.00000  1\n".format(
@@ -356,6 +356,9 @@ class Model:
             f.write(
                 "0.000000D+00 0.0000000D+02    0.00000 0.000000 0.0000000       0.00000000\n"
             )
+            for i in range(self.IFVC1 + self.IFVC2):
+                f.write(
+                    "  7 1.000000D+00 2.000000D+00 -0.029  0.669  0.726  0.285 0.000D+00 0.00000D+00 0.12000 0.44000 0.55000 0.95000  0.440000 1\n")
             for lc in self.lc:
                 f.write(
                     "{0:3d} 1.000000D+00 2.000000D+00 -0.029  0.669  0.726  0.285  0.0000D+00 0.000D+00 0 0.00000D+00 0.12000 0.44000 0.55000 0.95000 1\n".format(
@@ -389,10 +392,15 @@ class Model:
                                 item.phase, item.mag, 1 / item.mag_err ** 2
                             )
                         )
-                        # f.write('{0:14.5f}{1:11.6f}{2:8.3f}\n'.format(
-                        # item.phase, item.mag, 1))
                 if j != len(self.lc) - 1:
                     f.write("{0:14.5f}{1:11.6f}{2:8.3f}".format(-10001, 0, 0))
+            if self.IFVC1 + self.IFVC2 != 0:
+                f.write("{0:14.5f}{1:11.6f}{2:8.3f}\n".format(-10001, 0, 0))
+                for rv in self.rv:
+                    data_sel = rv.data
+                    for i in range(len(data_sel)):
+                        item = data_sel.iloc[i]
+                        f.write("{0:14.5f}{1:6d}{2:13.5f}\n".format(item.phase, rv.mntype, item.v))
             f.write("  -10001.\n")
             f.write(" 2\n")
 
