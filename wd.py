@@ -90,6 +90,7 @@ class RV:
         """
         self.data = data
         self.mntype = mntype
+        self.check_err()
 
     def cal_phase(self, HJD0, PERIOD):
         """Calcualte the phase from JD
@@ -105,6 +106,10 @@ class RV:
         """Sort the order based on phase"""
         self.data.sort_values("phase", inplace=True)
         self.data.reset_index(inplace=True, drop=True)
+
+    def check_err(self):
+        if "v_err" not in self.data.columns:
+            self.data = self.data.assign(v_err=1)
 
 
 class Model:
