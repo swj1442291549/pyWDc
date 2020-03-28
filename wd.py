@@ -633,16 +633,11 @@ class Model:
         with open("run/{0}/lcin.input_from_DC".format(self.directory), "r") as f:
             lines = f.readlines()
         with open("run/{0}/lcin.active".format(self.directory), "w") as f:
-            is_write = False
             for i, line in enumerate(lines):
-                if is_write:
-                    if "-0.200000    1.000000" not in line:
-                        f.write(line)
-                    else:
-                        f.write(line.replace("-0.200000", " 0.000000"))
-                if line == "150.\n":
-                    is_write = True
-
+                if "-0.200000    1.000000" not in line:
+                    f.write(line)
+                else:
+                    f.write(line.replace("-0.200000", " 0.000000"))
         subprocess.call(
             "cd run/{0};./lc".format(self.directory),
             shell=True,
