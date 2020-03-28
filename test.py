@@ -3,7 +3,7 @@ import pandas as pd
 from wd import LC, Model
 
 if __name__ == "__main__":
-    lc_data = pd.read_csv("test/testdata.csv")
+    lc_data = pd.read_csv("test/test_lc.csv")
     output_folder = "testresult"
     lc = LC(lc_data, IBAND=7, WLA=0.551, AEXTINC=0.14, CALIB=0.36895)
     mod = Model([lc], "test", PERIOD=0.372382, TAVH=0.571711)
