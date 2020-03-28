@@ -648,50 +648,63 @@ class Model:
     def read_lcout(self):
         with open("run/{0}/lcout.active".format(self.directory), "r") as f:
             lines = f.readlines()
+        start_line_list = list()
+        mpage_list = list()
         for i, line in enumerate(lines):
-            if "mpage" in line:
-                start_line = i
-                break
-        try:
-            start_line
-        except:
-            pass
-        else:
-            split = [
-                item for item in re.split("\s|\n", lines[4 + start_line]) if item != ""
-            ]
-            self.PSHIFT = self.tf_number(split[4])
-            split = [
-                item for item in re.split("\s|\n", lines[13 + start_line]) if item != ""
-            ]
-            XINCL = self.tf_number(split[5])
-            self.XINCL = XINCL if XINCL <= 90 else 180 - XINCL
-            split = [
-                item for item in re.split("\s|\n", lines[16 + start_line]) if item != ""
-            ]
-            # self.TAVH = self.tf_number(split[0])
-            self.TAVC = self.tf_number(split[1])
-            self.P = self.tf_number(split[4])
-            self.q = self.tf_number(split[6])
+            if "mpage" in line and int(lines[i + 1].split()[0]) < 3:
+                start_line_list.append(i)
+                mpage_list.append(int(lines[i + 1].split()[0]))
 
-            index_list = list()
-            star_list = list()
-            rad_list = list()
-            for i, line in enumerate(lines):
-                if "magnitude" in line:
-                    index_list.append(i)
-                if "erg" in line:
-                    star_list.append(i)
-                if "deriv" in line:
-                    rad_list.append(i)
-            fit_list = list()
-            for index in index_list:
+        split = [
+            item for item in re.split("\s|\n", lines[4 + start_line_list[0]]) if item != ""
+        ]
+        self.PSHIFT = self.tf_number(split[4])
+        split = [
+            item for item in re.split("\s|\n", lines[13 + start_line_list[0]]) if item != ""
+        ]
+        XINCL = self.tf_number(split[5])
+        self.XINCL = XINCL if XINCL <= 90 else 180 - XINCL
+        split = [
+            item for item in re.split("\s|\n", lines[16 + start_line_list[0]]) if item != ""
+        ]
+        self.TAVC = self.tf_number(split[1])
+        self.P = self.tf_number(split[4])
+        self.q = self.tf_number(split[6])
+
+        for i, line in enumerate(lines):
+            if "erg/sec/cm" in line:
+                star_line = i + 1
+                break
+
+        df = pd.read_csv(
+            "run/{0}/lcout.active".format(self.directory),
+            delim_whitespace=True,
+            skipinitialspace=True,
+            index_col=False,
+            skiprows=star_line,
+            nrows=2,
+            names=["star", "m", "radius", "M_bol", "logg", "L", "Lsun"],
+        )
+        L1 = self.tf_number(df.iloc[0].L)
+        L2 = self.tf_number(df.iloc[1].L)
+        self.rad1 = self.tf_number(df.iloc[0].radius)
+        self.rad2 = self.tf_number(df.iloc[1].radius)
+        self.l_ratio = np.mean(L1 / (L1 + L2))
+
+        fit_list = list()
+        fit_rv_list = list()
+        for i in range(len(mpage_list)):
+            if mpage_list[i] == 1:
+                for j, line in enumerate(lines[start_line_list[i]: start_line_list[i] + 100]):
+                    if line == "      JD               Phase     light 1       light 2       (1+2+3)      norm lite      sep/a   magnitude  magnitude      (days)\n":
+                        line_df = j + 1
+                        break
                 df = pd.read_csv(
                     "run/{0}/lcout.active".format(self.directory),
                     delim_whitespace=True,
                     skipinitialspace=True,
                     index_col=False,
-                    skiprows=index + 1,
+                    skiprows=start_line_list[i] + line_df,
                     nrows=100,
                     names=[
                         "jd",
@@ -707,24 +720,34 @@ class Model:
                     ],
                 )
                 fit_list.append(df)
-            self.fit = fit_list
-            l_ratio_list = list()
-            for index in star_list:
+            elif mpage_list[i] == 2:
+                for j, line in enumerate(lines[start_line_list[i]: start_line_list[i] + 100]):
+                    if line == "      JD              Phase     V Rad 1     V Rad 2     del V1      del V2      V1 km/s        V2 km/s         (days)\n": 
+                        line_df = j + 1
+                        break
                 df = pd.read_csv(
                     "run/{0}/lcout.active".format(self.directory),
                     delim_whitespace=True,
                     skipinitialspace=True,
                     index_col=False,
-                    skiprows=index + 1,
-                    nrows=2,
-                    names=["star", "m", "radius", "M_bol", "logg", "L", "Lsun"],
+                    skiprows=start_line_list[i] + line_df,
+                    nrows=100,
+                    names=[
+                        "jd",
+                        "phase",
+                        "vrad1",
+                        "vrad2",
+                        "dvrad1",
+                        "dvrad2",
+                        "v1",
+                        "v2",
+                        "time",
+                    ],
                 )
-                L1 = self.tf_number(df.iloc[0].L)
-                L2 = self.tf_number(df.iloc[1].L)
-                l_ratio_list.append(L1 / (L1 + L2))
-                self.rad1 = self.tf_number(df.iloc[0].radius)
-                self.rad2 = self.tf_number(df.iloc[1].radius)
-                self.l_ratio = np.mean(l_ratio_list)
+                fit_rv_list.append(df)
+
+        self.fit = fit_list
+        self.fit_rv = fit_rv_list
 
     @staticmethod
     def tf_number(input_string):
