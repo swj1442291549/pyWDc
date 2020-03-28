@@ -692,7 +692,6 @@ class Model:
         self.l_ratio = np.mean(L1 / (L1 + L2))
 
         fit_list = list()
-        fit_rv_list = list()
         for i in range(len(mpage_list)):
             if mpage_list[i] == 1:
                 for j, line in enumerate(lines[start_line_list[i]: start_line_list[i] + 100]):
@@ -744,10 +743,9 @@ class Model:
                         "time",
                     ],
                 )
-                fit_rv_list.append(df)
+                self.fit_rv = df
 
         self.fit = fit_list
-        self.fit_rv = fit_rv_list
 
     @staticmethod
     def tf_number(input_string):
