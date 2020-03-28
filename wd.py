@@ -630,20 +630,23 @@ class Model:
             plt.show()
 
     def find_q_best(self):
-        res_sel = self.res[self.res.res < np.percentile(self.res.res, 25)]
-        res_sort = self.res.sort_values("res")
-        for position in range(len(self.res)):
-            index = res_sort.iloc[position].name
-            if index == 0 or index == len(self.res) - 1:
-                continue
-            elif (
-                self.res.loc[index - 1].q not in res_sel.q.values
-                and self.res.loc[index + 1].q not in res_sel.q.values
-            ):
-                continue
-            else:
-                break
-        self.q_best = self.res.loc[index].q
+        if hasattr(self, "qout"):
+            self.q_best = np.median(self.qout.qout)
+        else:
+            res_sel = self.res[self.res.res < np.percentile(self.res.res, 25)]
+            res_sort = self.res.sort_values("res")
+            for position in range(len(self.res)):
+                index = res_sort.iloc[position].name
+                if index == 0 or index == len(self.res) - 1:
+                    continue
+                elif (
+                    self.res.loc[index - 1].q not in res_sel.q.values
+                    and self.res.loc[index + 1].q not in res_sel.q.values
+                ):
+                    continue
+                else:
+                    break
+            self.q_best = self.res.loc[index].q
 
     def save(self, prefix=""):
         """Save the result to pkl"""
