@@ -267,13 +267,22 @@ class Model:
         ax.set_xlim(-0.2, 1.2)
         ax.invert_yaxis()
         ax.legend()
+        rv_color_list = ['red', 'blue']
         if self.IFVC1 + self.IFVC2 != 0:
             for rv in self.rv:
                 phase = np.concatenate(
                     [rv.data.phase - 1, rv.data.phase, rv.data.phase + 1]
-                )  # - self.PSHIFT
+                )  - self.PSHIFT
                 v = np.concatenate([rv.data.v, rv.data.v, rv.data.v])
-                ax_rv.scatter(phase, v, label="{0:d}".format(rv.mntype), s=2)
+                ax_rv.scatter(phase, v, label="{0:d}".format(rv.mntype), s=4, c=rv_color_list[rv.mntype - 1])
+            if hasattr(self, "fit_rv"):
+                phase = np.concatenate(
+                    [self.fit_rv.phase - 1, self.fit_rv.phase, self.fit_rv.phase + 1]
+                )  - self.PSHIFT
+                v1 = np.concatenate([self.fit_rv.v1, self.fit_rv.v1, self.fit_rv.v1])
+                v2 = np.concatenate([self.fit_rv.v2, self.fit_rv.v2, self.fit_rv.v2])
+                ax_rv.plot(phase, v1, label='__nolegend__', c=rv_color_list[0], alpha=0.5)
+                ax_rv.plot(phase, v2, label='__nolegend__', c=rv_color_list[1], alpha=0.5)
             ax_rv.set_ylabel(r"$v_r$ (km/s)")
             ax_rv.set_xlabel(r"Phase")
             ax_rv.legend()
