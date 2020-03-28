@@ -634,6 +634,23 @@ class Model:
         else:
             plt.show()
 
+    def plot_qout(self, save_path=None):
+        fig, ax = plt.subplots()
+        ax.plot(self.qout.q, self.qout.qout)
+        ax.scatter(self.qout.q, self.res.qout, s=4)
+        if hasattr(self, "q_best"):
+            ax.hlines(self.q_best, min(self.qout.q), max(self.qout.q))
+        ax.set_xlabel(r"q")
+        ax.set_ylabel(r"qout")
+        if save_path:
+            p = Path("fig/{0}".format(save_path))
+            if not p.is_dir():
+                p.mkdir(parent=True)
+            plt.savefig("fig/{0}/{1}_qout.pdf".format(save_path, self.directory))
+            plt.close()
+        else:
+            plt.show()
+
     def find_q_best(self):
         if hasattr(self, "qout"):
             self.q_best = np.median(self.qout.qout)
