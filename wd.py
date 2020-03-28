@@ -530,6 +530,28 @@ class Model:
             alarm_time *= 2
         self.res = pd.DataFrame({"q": q_list, "res": res_list}).sort_values("q")
 
+    def cal_qout_curve(self):
+        """Calculate the qout curve"""
+        q_array = np.append(
+            np.append(np.arange(0.05, 0.5, 0.02), np.arange(0.5, 2, 0.05)),
+            np.arange(2, 10, 0.25),
+        )
+        q_list = list()
+        qout_list = list()
+        alarm_time = 30 * self.NLC
+        while len(qout_list) < 50 and alarm_time <= 120 * self.NLC:
+            for q in q_array:
+                print(q)
+                if q not in q_list:
+                    if self.run_dc(q, alarm_time=alarm_time, is_rm_fix=False):
+                        qout = self.read_lcin()
+                        if not isinstance(qout, type(None)):
+                            if not np.isnan(qout):
+                                q_list.append(q)
+                                qout_list.append(qout)
+            alarm_time *= 2
+        self.qout = pd.DataFrame({"q": q_list, "qout": qout_list}).sort_values("q")
+
     def cal_res_curve_test(self):
         """Calculate the residual curve for test"""
         q_array = np.array([0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 3, 5])
