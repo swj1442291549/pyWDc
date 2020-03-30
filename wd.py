@@ -439,6 +439,7 @@ class Model:
         else:
             signal.alarm(alarm_time * self.NLC)
         self.PHSV, self.PCSV = self.cal_potential(RM)
+        self.clean_active()
         self.generate_dcin(RM=RM, is_rm_fix=is_rm_fix, A=A)
         try:
             pro = subprocess.Popen(
@@ -840,6 +841,13 @@ class Model:
             print("mass: {0:.2f} {1:.2f}".format(self.mp, self.ms))
         if hasattr(self, "radp"):
             print("rad: {0:.2f} {1:.2f}".format(self.radp, self.rads))
+
+    def clean_active(self):
+        filename_list = ["dcin.active", "dcout.active", "lcin.active", "lcout.active", "lcin.input_from_dc"]
+        for filename in filename_list:
+            p = Path("run/{0}/{1}".format(self.directory, filename))
+            if p.is_file():
+                p.unlink()
 
     def cal_fit(self):
         if self.q_best < 1:
