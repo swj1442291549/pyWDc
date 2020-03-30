@@ -133,15 +133,17 @@ class Model:
                     self.IFVC1 = 1
                 else:
                     self.IFVC2 = 1
+        if self.NLC + self.IFVC1 + self.IFVC2 == 0:
+            raise Exception("Provide at least one LC or RV")
         self.PERIOD = PERIOD
         self.temp_color = TAVH
+        self.directory = directory
         self.TAVH = TAVH
         self.TAVC = TAVH
         self.VUNIT = 100
         self.cal_hjd0()
         self.cal_phase()
         self.cal_pshift()
-        self.directory = directory
 
     def cal_hjd0(self):
         """Calculate HJD0
