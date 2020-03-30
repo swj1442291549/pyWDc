@@ -136,7 +136,7 @@ class Model:
                     self.IFVC1 = 1
                 else:
                     self.IFVC2 = 1
-        if self.NLC + self.IFVC1 + self.IFVC2 == 0:
+        if self.lc == None and self.rv == None:
             raise Exception("Provide at least one LC or RV")
         self.PERIOD = PERIOD
         self.temp_color = TAVH
@@ -156,11 +156,11 @@ class Model:
         has_jd = False
         hjd0_lc = np.nan
         hjd0_rv = np.nan
-        if self.NLC > 0:
+        if self.lc:
             if "jd" in self.lc[0].data.columns:
                 has_jd = True
                 hjd0_lc = min([min(lc.data.jd) for lc in self.lc])
-        if self.IFVC1 + self.IFVC2 > 0:
+        if self.rv:
             if "jd" in self.rv[0].data.columns:
                 has_jd = True
                 hjd0_rv = min([min(rv.data.jd) for rv in self.rv])
@@ -171,14 +171,14 @@ class Model:
 
     def cal_phase(self):
         """Calculate PHASE"""
-        if self.NLC > 0:
+        if self.lc:
             for lc in self.lc:
                 if "phase" in lc.data.columns:
                     lc.sort_phase()
                 else:
                     lc.cal_phase(self.HJD0, self.PERIOD)
                     lc.sort_phase()
-        if self.IFVC1 + self.IFVC2 > 0:
+        if self.rv:
             for rv in self.rv:
                 if "phase" in rv.data.columns:
                     rv.sort_phase()
@@ -191,7 +191,7 @@ class Model:
 
         Use the average of nearby 5 data points to determine the largest peak
         """
-        if self.NLC > 0:
+        if self.lc:
             pshift_0 = self.lc[0].data.phase.iloc[
                 self.lc[0].data.mag.shift(periods=1).rolling(5).mean().idxmax()
             ]
@@ -241,15 +241,15 @@ class Model:
 
     def plot_lc(self, save_path=None):
         """Plot the light curve"""
-        if self.IFVC1 + self.IFVC2 == 0:
+        if not self.rv:
             fig, ax = plt.subplots()
-        elif self.NLC == 0:
+        elif not self.lc:
             fig, ax_rv = plt.subplots()
         else:
             fig, (ax, ax_rv) = plt.subplots(
                 2, 1, gridspec_kw={"height_ratios": [3, 1]}, sharex=True
             )
-        if self.NLC > 0:
+        if self.lc:
             for lc in self.lc:
                 if "flag" not in lc.data.columns:
                     phase = np.concatenate(
@@ -283,7 +283,7 @@ class Model:
             ax.invert_yaxis()
             ax.legend()
         rv_color_list = ['red', 'blue']
-        if self.IFVC1 + self.IFVC2 != 0:
+        if self.rv:
             for rv in self.rv:
                 phase = np.concatenate(
                     [rv.data.phase - 1, rv.data.phase, rv.data.phase + 1]
@@ -403,7 +403,7 @@ class Model:
             f.write("300.00000\n")
             f.write("300.00000\n")
             f.write("150.\n")
-            if self.IFVC1 + self.IFVC2 > 0:
+            if self.rv:
                 for rv in self.rv:
                     for i in range(len(rv.data)):
                         item = rv.data.iloc[i]
