@@ -924,27 +924,27 @@ class Model:
 
     def cal_bol_mag_abs(self, dm):
         self.dm = dm
-        self.run_dc(self.q_best, alarm_time=100)
-        self.run_lc()
-        self.read_lcout()
-        if len(self.lc) == 1:
-            mag_abs = np.min(self.fit[0].magd) - self.dm - self.lc[0].AEXTINC
-        else:
-            for i, lc in enumerate(self.lc):
-                if lc.IBAND == 7:
-                    mag_abs = np.min(self.fit[i].magd) - self.dm - lc.AEXTINC
-        self.mag_abs = mag_abs
-        l1 = 10 ** (self.mag_abs / -2.5) * self.l_ratio
-        l2 = 10 ** (self.mag_abs / -2.5) * (1 - self.l_ratio)
-        self.mag1_abs = np.log10(l1) * -2.5
-        self.mag2_abs = np.log10(l2) * -2.5
-        self.BC1 = self.cal_bc(self.TAVH * 1e4)
-        self.BC2 = self.cal_bc(self.TAVC * 1e4)
-        self.mag1_abs_bol = self.mag1_abs + self.BC1
-        self.mag2_abs_bol = self.mag2_abs + self.BC2
-        self.l1_bol = 10 ** ((self.mag1_abs_bol - 4.75) / -2.5)
-        self.l2_bol = 10 ** ((self.mag2_abs_bol - 4.75) / -2.5)
-        self.mag_abs_bol = -2.5 * np.log10(self.l1_bol + self.l2_bol) + 4.75
+        if self.run_dc(self.q_best, alarm_time=200):
+            self.run_lc()
+            self.read_lcout()
+            if len(self.lc) == 1:
+                mag_abs = np.min(self.fit[0].magd) - self.dm - self.lc[0].AEXTINC
+            else:
+                for i, lc in enumerate(self.lc):
+                    if lc.IBAND == 7:
+                        mag_abs = np.min(self.fit[i].magd) - self.dm - lc.AEXTINC
+            self.mag_abs = mag_abs
+            l1 = 10 ** (self.mag_abs / -2.5) * self.l_ratio
+            l2 = 10 ** (self.mag_abs / -2.5) * (1 - self.l_ratio)
+            self.mag1_abs = np.log10(l1) * -2.5
+            self.mag2_abs = np.log10(l2) * -2.5
+            self.BC1 = self.cal_bc(self.TAVH * 1e4)
+            self.BC2 = self.cal_bc(self.TAVC * 1e4)
+            self.mag1_abs_bol = self.mag1_abs + self.BC1
+            self.mag2_abs_bol = self.mag2_abs + self.BC2
+            self.l1_bol = 10 ** ((self.mag1_abs_bol - 4.75) / -2.5)
+            self.l2_bol = 10 ** ((self.mag2_abs_bol - 4.75) / -2.5)
+            self.mag_abs_bol = -2.5 * np.log10(self.l1_bol + self.l2_bol) + 4.75
 
     def cal_bc(self, T):
         table = Table.read("material/Pecaut.fit").to_pandas()
