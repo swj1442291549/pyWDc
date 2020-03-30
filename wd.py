@@ -137,6 +137,7 @@ class Model:
         self.temp_color = TAVH
         self.TAVH = TAVH
         self.TAVC = TAVH
+        self.VUNIT = 100
         self.cal_hjd0()
         self.cal_phase()
         self.cal_pshift()
@@ -343,8 +344,8 @@ class Model:
                 )
             )  # HJD0, PZERO, PSHIFT
             f.write(
-                " 3 0 1 1  30  30  10  10{0:13.6f}{1:13.5e} 0.00000  100.000\n".format(
-                    0, 0
+                    " 3 0 1 1  30  30  10  10{0:13.6f}{1:13.5e} 0.00000{2:9.3f}\n".format(
+                    0, 0, self.VUNIT
                 )
             )  # PERR0, DPERDT
             f.write(
@@ -394,7 +395,7 @@ class Model:
                         item = rv.data.iloc[i]
                         f.write(
                             "{0:14.5f}{1:11.6f}{2:8.3f}\n".format(
-                                item.phase, item.v, 1 / item.v_err ** 2
+                                item.phase, item.v / self.VUNIT, 1 / (item.v_err) ** 2
                             )
                         )
                     f.write("{0:14.5f}{1:11.6f}{2:8.3f}\n".format(-10001, 0, 0))
