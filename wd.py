@@ -186,18 +186,20 @@ class Model:
 
         Use the average of nearby 5 data points to determine the largest peak
         """
-        pshift_0 = self.lc[0].data.phase.iloc[
-            self.lc[0].data.mag.shift(periods=1).rolling(5).mean().idxmax()
-        ]
-        pshift_list = list()
-        for lc in self.lc:
-            pshift = lc.data.phase.iloc[
-                lc.data.mag.shift(periods=1).rolling(5).mean().idxmax()
+        if self.NLC > 0:
+            pshift_0 = self.lc[0].data.phase.iloc[
+                self.lc[0].data.mag.shift(periods=1).rolling(5).mean().idxmax()
             ]
-            if np.abs(pshift - pshift_0) > 0.7:
-                pshift += -1 if pshift > pshift_0 else 1
-            pshift_list.append(pshift)
-        self.PSHIFT = np.mean(pshift_list)
+            pshift_list = list()
+            for lc in self.lc:
+                pshift = lc.data.phase.iloc[
+                    lc.data.mag.shift(periods=1).rolling(5).mean().idxmax()
+                ]
+                if np.abs(pshift - pshift_0) > 0.7:
+                    pshift += -1 if pshift > pshift_0 else 1
+                pshift_list.append(pshift)
+            self.PSHIFT = np.mean(pshift_list)
+        else: self.PSHIFT = 0
 
     def cal_potential(self, q):
         """Calculate the potential for Star 1 and Star 2
