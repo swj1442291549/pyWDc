@@ -239,27 +239,27 @@ class Model:
             if "flag" not in lc.data.columns:
                 phase = np.concatenate(
                     [lc.data.phase - 1, lc.data.phase, lc.data.phase + 1]
-                )  - self.PSHIFT
+                ) # - self.PSHIFT
                 mag = np.concatenate([lc.data.mag, lc.data.mag, lc.data.mag])
                 ax.scatter(phase, mag, s=4, label="{0}".format(lc.IBAND))
             else:
                 data_sel = lc.data[lc.data.flag == True]
                 phase = np.concatenate(
                     [data_sel.phase - 1, data_sel.phase, data_sel.phase + 1]
-                )  - self.PSHIFT
+                ) # - self.PSHIFT
                 mag = np.concatenate([data_sel.mag, data_sel.mag, data_sel.mag])
                 ax.scatter(phase, mag, s=4, label="{0}".format(lc.IBAND))
                 data_sel = lc.data[lc.data.flag == False]
                 phase = np.concatenate(
                     [data_sel.phase - 1, data_sel.phase, data_sel.phase + 1]
-                )  - self.PSHIFT
+                ) # - self.PSHIFT
                 mag = np.concatenate([data_sel.mag, data_sel.mag, data_sel.mag])
                 ax.scatter(phase, mag, s=8, label="__nolegend__", marker="x")
         if hasattr(self, "fit"):
             for df in self.fit:
                 phase = np.concatenate(
                     [df.phase - 1, df.phase, df.phase + 1]
-                )  - self.PSHIFT
+                ) # - self.PSHIFT
                 mag = np.concatenate([df.magd, df.magd, df.magd])
                 ax.plot(phase, mag, label="__nolegend__", c="red")
         ax.set_xlabel(r"Phase")
@@ -272,13 +272,13 @@ class Model:
             for rv in self.rv:
                 phase = np.concatenate(
                     [rv.data.phase - 1, rv.data.phase, rv.data.phase + 1]
-                )  - self.PSHIFT
+                ) # - self.PSHIFT
                 v = np.concatenate([rv.data.v, rv.data.v, rv.data.v])
                 ax_rv.scatter(phase, v, label="{0:d}".format(rv.mntype), s=4, c=rv_color_list[rv.mntype - 1])
             if hasattr(self, "fit_rv"):
                 phase = np.concatenate(
                     [self.fit_rv.phase - 1, self.fit_rv.phase, self.fit_rv.phase + 1]
-                )  - self.PSHIFT
+                ) # - self.PSHIFT
                 v1 = np.concatenate([self.fit_rv.v1, self.fit_rv.v1, self.fit_rv.v1])
                 v2 = np.concatenate([self.fit_rv.v2, self.fit_rv.v2, self.fit_rv.v2])
                 ax_rv.plot(phase, v1, label='__nolegend__', c=rv_color_list[0], alpha=0.5)
