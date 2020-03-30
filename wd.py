@@ -453,10 +453,11 @@ class Model:
             pro.communicate()
         except TimeoutException:
             self.kill_dc()
-            return False
         else:
             signal.alarm(0)
-            return True
+
+        p = Path("run/{0}/lcin.input_from_DC".format(self.directory))
+        return p.is_file()
 
     def kill_dc(self):
         """Kill DC"""
