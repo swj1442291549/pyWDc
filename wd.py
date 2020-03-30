@@ -149,17 +149,20 @@ class Model:
         If LC only has phase, pick an arbitary HJD0. Else, pick the minimum of JD.
         """
         has_jd = False
-        for lc in self.lc:
-            if "jd" in lc.data.columns:
+        hjd0_lc = None
+        hjd0_rv = None
+        if self.NLC > 0:
+            if "jd" in self.lc[0].data.columns:
                 has_jd = True
-                break
+                hjd0_lc = min([min(lc.data.jd) for lc in self.lc])
+        if self.IFVC1 + self.IFVC2 > 0:
+            if "jd" in self.rv[0].data.columns:
+                has_jd = True
+                hjd0_rv = min([min(rv.data.jd) for rv in self.rv])
         if not has_jd:
             self.HJD0 = 50000.0
         else:
-            if self.IFVC1 + self.IFVC2 == 0:
-                self.HJD0 = min([min(lc.data.jd) for lc in self.lc])
-            else:
-                self.HJD0 = min([min([min(lc.data.jd) for lc in self.lc]), min([min(rv.data.jd) for rv in self.rv])])
+            self.HJD0 = np.min([hjd0_lc, hjd0_rv])
 
     def cal_phase(self):
         """Calculate PHASE"""
