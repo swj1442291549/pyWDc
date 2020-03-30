@@ -113,18 +113,21 @@ class RV:
 
 
 class Model:
-    def __init__(self, lc_list, directory, PERIOD, TAVH, rv_list=None):
+    def __init__(self, lc_list, rv_list, directory, PERIOD, TAVH):
         """Model
 
         Args:
             directory (string): output directory
             lc_list (list): list of light curves
+            rv_list (list): list of radial velocities
             PERIOD (float): period
             TAVH (float): Effective temperature in 10000K
         """
         self.lc = lc_list
         self.rv = rv_list
-        self.NLC = len(lc_list)
+        self.NLC = 0
+        if self.lc != None:
+            self.NLC = len(lc_list)
         self.IFVC1 = 0
         self.IFVC2 = 0
         if self.rv != None:
