@@ -240,42 +240,45 @@ class Model:
         """Plot the light curve"""
         if self.IFVC1 + self.IFVC2 == 0:
             fig, ax = plt.subplots()
+        elif self.NLC == 0:
+            fig, ax_rv = plt.subplots()
         else:
             fig, (ax, ax_rv) = plt.subplots(
                 2, 1, gridspec_kw={"height_ratios": [3, 1]}, sharex=True
             )
-        for lc in self.lc:
-            if "flag" not in lc.data.columns:
-                phase = np.concatenate(
-                    [lc.data.phase - 1, lc.data.phase, lc.data.phase + 1]
-                ) # - self.PSHIFT
-                mag = np.concatenate([lc.data.mag, lc.data.mag, lc.data.mag])
-                ax.scatter(phase, mag, s=4, label="{0}".format(lc.IBAND))
-            else:
-                data_sel = lc.data[lc.data.flag == True]
-                phase = np.concatenate(
-                    [data_sel.phase - 1, data_sel.phase, data_sel.phase + 1]
-                ) # - self.PSHIFT
-                mag = np.concatenate([data_sel.mag, data_sel.mag, data_sel.mag])
-                ax.scatter(phase, mag, s=4, label="{0}".format(lc.IBAND))
-                data_sel = lc.data[lc.data.flag == False]
-                phase = np.concatenate(
-                    [data_sel.phase - 1, data_sel.phase, data_sel.phase + 1]
-                ) # - self.PSHIFT
-                mag = np.concatenate([data_sel.mag, data_sel.mag, data_sel.mag])
-                ax.scatter(phase, mag, s=8, label="__nolegend__", marker="x")
-        if hasattr(self, "fit"):
-            for df in self.fit:
-                phase = np.concatenate(
-                    [df.phase - 1, df.phase, df.phase + 1]
-                ) # - self.PSHIFT
-                mag = np.concatenate([df.magd, df.magd, df.magd])
-                ax.plot(phase, mag, label="__nolegend__", c="red")
-        ax.set_xlabel(r"Phase")
-        ax.set_ylabel(r"Magnitude (mag)")
-        ax.set_xlim(-0.2, 1.2)
-        ax.invert_yaxis()
-        ax.legend()
+        if self.NLC > 0:
+            for lc in self.lc:
+                if "flag" not in lc.data.columns:
+                    phase = np.concatenate(
+                        [lc.data.phase - 1, lc.data.phase, lc.data.phase + 1]
+                    ) # - self.PSHIFT
+                    mag = np.concatenate([lc.data.mag, lc.data.mag, lc.data.mag])
+                    ax.scatter(phase, mag, s=4, label="{0}".format(lc.IBAND))
+                else:
+                    data_sel = lc.data[lc.data.flag == True]
+                    phase = np.concatenate(
+                        [data_sel.phase - 1, data_sel.phase, data_sel.phase + 1]
+                    ) # - self.PSHIFT
+                    mag = np.concatenate([data_sel.mag, data_sel.mag, data_sel.mag])
+                    ax.scatter(phase, mag, s=4, label="{0}".format(lc.IBAND))
+                    data_sel = lc.data[lc.data.flag == False]
+                    phase = np.concatenate(
+                        [data_sel.phase - 1, data_sel.phase, data_sel.phase + 1]
+                    ) # - self.PSHIFT
+                    mag = np.concatenate([data_sel.mag, data_sel.mag, data_sel.mag])
+                    ax.scatter(phase, mag, s=8, label="__nolegend__", marker="x")
+            if hasattr(self, "fit"):
+                for df in self.fit:
+                    phase = np.concatenate(
+                        [df.phase - 1, df.phase, df.phase + 1]
+                    ) # - self.PSHIFT
+                    mag = np.concatenate([df.magd, df.magd, df.magd])
+                    ax.plot(phase, mag, label="__nolegend__", c="red")
+            ax.set_xlabel(r"Phase")
+            ax.set_ylabel(r"Magnitude (mag)")
+            ax.set_xlim(-0.2, 1.2)
+            ax.invert_yaxis()
+            ax.legend()
         rv_color_list = ['red', 'blue']
         if self.IFVC1 + self.IFVC2 != 0:
             for rv in self.rv:
