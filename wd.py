@@ -638,7 +638,7 @@ class Model:
     def plot_qout(self, save_path=None):
         fig, ax = plt.subplots()
         ax.plot(self.qout.q, self.qout.qout)
-        ax.scatter(self.qout.q, self.res.qout, s=4)
+        ax.scatter(self.qout.q, self.qout.qout, s=4)
         if hasattr(self, "q_best"):
             ax.hlines(self.q_best, min(self.qout.q), max(self.qout.q))
         ax.set_xlabel(r"q")
