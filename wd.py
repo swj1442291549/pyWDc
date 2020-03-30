@@ -166,13 +166,14 @@ class Model:
 
     def cal_phase(self):
         """Calculate PHASE"""
-        for lc in self.lc:
-            if "phase" in lc.data.columns:
-                lc.sort_phase()
-            else:
-                lc.cal_phase(self.HJD0, self.PERIOD)
-                lc.sort_phase()
-        if self.IFVC1 + self.IFVC2 != 0:
+        if self.NLC > 0:
+            for lc in self.lc:
+                if "phase" in lc.data.columns:
+                    lc.sort_phase()
+                else:
+                    lc.cal_phase(self.HJD0, self.PERIOD)
+                    lc.sort_phase()
+        if self.IFVC1 + self.IFVC2 > 0:
             for rv in self.rv:
                 if "phase" in rv.data.columns:
                     rv.sort_phase()
