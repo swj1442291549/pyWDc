@@ -800,6 +800,8 @@ class Model:
                         "time",
                     ],
                 )
+                df.v1 *= self.VUNIT
+                df.v2 *= self.VUNIT
                 self.fit_rv = df
 
         self.fit = fit_list
