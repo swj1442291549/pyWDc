@@ -461,7 +461,7 @@ class Model:
         """Kill DC"""
         os.killpg(os.getpgid(self.pid), signal.SIGTERM)
 
-    def read_lcin(self):
+    def read_qout_lcin(self):
         with open("run/{0}/lcin.input_from_DC".format(self.directory), "r") as f:
             lines = f.readlines()
             return self.tf_number(lines[5].split()[6])
