@@ -149,8 +149,8 @@ class Model:
         If LC only has phase, pick an arbitary HJD0. Else, pick the minimum of JD.
         """
         has_jd = False
-        hjd0_lc = None
-        hjd0_rv = None
+        hjd0_lc = np.nan
+        hjd0_rv = np.nan
         if self.NLC > 0:
             if "jd" in self.lc[0].data.columns:
                 has_jd = True
@@ -162,7 +162,7 @@ class Model:
         if not has_jd:
             self.HJD0 = 50000.0
         else:
-            self.HJD0 = np.min([hjd0_lc, hjd0_rv])
+            self.HJD0 = np.nanmin([hjd0_lc, hjd0_rv])
 
     def cal_phase(self):
         """Calculate PHASE"""
