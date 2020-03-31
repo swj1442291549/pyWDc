@@ -388,23 +388,24 @@ class Model:
             for i in range(self.IFVC1 + self.IFVC2):
                 f.write(
                     "  7 1.000000D+00 2.000000D+00 -0.029  0.669  0.726  0.285 0.000D+00 0.00000D+00 0.12000 0.44000 0.55000 0.95000  0.440000 1\n")
-            for lc in self.lc:
-                f.write(
-                    "{0:3d} 1.000000D+00 2.000000D+00 -0.029  0.669  0.726  0.285  0.0000D+00 0.000D+00 0 0.00000D+00 0.12000 0.44000 0.55000 0.95000 1\n".format(
-                        lc.IBAND
-                    )
-                )  # IBAND
-            for lc in self.lc:
-                f.write(
-                    "{0:9.6f}{1:8.4f} 1.0000D+00{2:12.5e}\n".format(
-                        lc.WLA, lc.AEXTINC, lc.CALIB
-                    )
-                )  # WLA, AEXTINC, CALIB
+            if self.lc:
+                for lc in self.lc:
+                    f.write(
+                        "{0:3d} 1.000000D+00 2.000000D+00 -0.029  0.669  0.726  0.285  0.0000D+00 0.000D+00 0 0.00000D+00 0.12000 0.44000 0.55000 0.95000 1\n".format(
+                            lc.IBAND
+                        )
+                    )  # IBAND
+                for lc in self.lc:
+                    f.write(
+                        "{0:9.6f}{1:8.4f} 1.0000D+00{2:12.5e}\n".format(
+                            lc.WLA, lc.AEXTINC, lc.CALIB
+                        )
+                    )  # WLA, AEXTINC, CALIB
             f.write("300.00000\n")
             f.write("300.00000\n")
             f.write("150.\n")
             if self.rv:
-                for rv in self.rv:
+                for j, rv in enumerate(self.rv):
                     for i in range(len(rv.data)):
                         item = rv.data.iloc[i]
                         f.write(
@@ -412,27 +413,29 @@ class Model:
                                 item.phase, item.v / self.VUNIT, 1 / (item.v_err) ** 2
                             )
                         )
-                    f.write("{0:14.5f}{1:11.6f}{2:8.3f}\n".format(-10001, 0, 0))
-            for j, lc in enumerate(self.lc):
-                if "flag" not in lc.data.columns:
-                    for i in range(len(lc.data)):
-                        item = lc.data.iloc[i]
-                        f.write(
-                            "{0:14.5f}{1:11.6f}{2:8.3f}\n".format(
-                                item.phase, item.mag, 1 / item.mag_err ** 2
+                    if self.lc or j != len(self.rv) - 1:
+                        f.write("{0:14.5f}{1:11.6f}{2:8.3f}\n".format(-10001, 0, 0))
+            if self.lc:
+                for j, lc in enumerate(self.lc):
+                    if "flag" not in lc.data.columns:
+                        for i in range(len(lc.data)):
+                            item = lc.data.iloc[i]
+                            f.write(
+                                "{0:14.5f}{1:11.6f}{2:8.3f}\n".format(
+                                    item.phase, item.mag, 1 / item.mag_err ** 2
+                                )
                             )
-                        )
-                else:
-                    data_sel = lc.data[lc.data.flag == True]
-                    for i in range(len(data_sel)):
-                        item = data_sel.iloc[i]
-                        f.write(
-                            "{0:14.5f}{1:11.6f}{2:8.3f}\n".format(
-                                item.phase, item.mag, 1 / item.mag_err ** 2
+                    else:
+                        data_sel = lc.data[lc.data.flag == True]
+                        for i in range(len(data_sel)):
+                            item = data_sel.iloc[i]
+                            f.write(
+                                "{0:14.5f}{1:11.6f}{2:8.3f}\n".format(
+                                    item.phase, item.mag, 1 / item.mag_err ** 2
+                                )
                             )
-                        )
-                if j != len(self.lc) - 1:
-                    f.write("{0:14.5f}{1:11.6f}{2:8.3f}\n".format(-10001, 0, 0))
+                    if j != len(self.lc) - 1:
+                        f.write("{0:14.5f}{1:11.6f}{2:8.3f}\n".format(-10001, 0, 0))
             f.write("  -10001.\n")
             f.write(" 2\n")
 
