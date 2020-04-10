@@ -563,17 +563,18 @@ class Model:
         )
         q_list = list()
         qout_list = list()
-        alarm_time = 30 * self.NLC
-        while len(qout_list) < 50 and alarm_time <= 120 * self.NLC:
+        alarm_time = 120 * self.NLC
+        while len(qout_list) < 30 and alarm_time <= 480 * self.NLC:
             for q in q_array:
-                print(q)
                 if q not in q_list:
+                    print(q)
                     if self.run_dc(q, alarm_time=alarm_time, is_rm_fix=False):
-                        qout = self.read_lcin()
+                        qout = self.read_qout_lcin()
                         if not isinstance(qout, type(None)):
                             if not np.isnan(qout):
                                 q_list.append(q)
                                 qout_list.append(qout)
+                                print("{0:.2f}: {1:.2f}".format(q, qout))
             alarm_time *= 2
         self.qout = pd.DataFrame({"q": q_list, "qout": qout_list}).sort_values("q")
 
