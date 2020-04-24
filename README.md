@@ -20,7 +20,7 @@ The mimumum requirements are "phase"/"jd" and "mag". If you have the information
 After that, generate a `LC` class:
 ```python
 from wd import LC
-lc = LC(mydata, IBAND, WLA, AEXTINC, CALIB)
+lc = LC(lc_data, IBAND, WLA, AEXTINC, CALIB)
 ```
 in which,
 - `IBAND` (int): Identifier in Table 2 of WD manual
@@ -33,36 +33,50 @@ Put all your `LC` in a list `lc_list` (depending on how many passbands you have)
 lc_list = [lc0, lc1, ...]
 ```
 
+If you have radial velocity data, you can generate a `RV` class by:
+```python
+from wd import RV
+rv = RV(rv_data, mntype=1)
+rv_list = [rv]
+```
+`mntype` tell whether the rv data belongs to the same star with temperature estimation. 1 if True, 2 if False.
+
 ## Run the WD modeling
-Generate the model based on `lc_list` through
+Generate the model through
 ```python
 from wd import Model
-mod = Model(lc_list, directory, PERIOD, TAVH)
+mod = Model(lc_list, rv_list, directory, PERIOD, TAVH)
 ```
 where
 - `directory` (string): runtime directory. It will be under `run` folder (which will generated automatically if not exists)
 - `PERIOD` (float): orbital period in days
 - `TAVH` (float): effective temperature of primary stars in 10000 K
 
-Then run the following code
+If rv data is not available, set `rv_list` to `None`. In this case, a `q`-search method (`cal_res_curve`) is emplemented to find the best `q` with the smallest residual.
+
+Then run the following code (without rv data)
 ```python
 mod.prepare_run()
 mod.clean_lc_gp()
 mod.cal_res_curve()
-try:
-    mod.find_q_best()
-    mod.cal_bol_mag_abs(dm)
-    mod.correct_temp_comb()
-    mod.cal_bol_mag_abs(dm)
-except:
-    pass
-else:
-    mod.cal_fit()
-    mod.save(output_folder)
-    mod.plot_lc(output_folder)
-    mod.plot_res(output_folder)
+mod.find_q_best()
+mod.cal_bol_mag_abs(dm)
+mod.correct_temp_comb()
+mod.cal_bol_mag_abs(dm)
+mod.cal_fit()
+mod.save(output_folder)
+mod.plot_lc(output_folder)
+mod.plot_res(output_folder)
 mod.clean_run()
 ```
+
+
+If spectroscopic data is available, we could derive `qsp` directly from rv. Thus, we replace `cal_res_curve` to
+```python
+mod.cal_qout_cuvre()
+mod.plot_qout()
+```
+Most `qout` should cluster around a given value no matter how input `q` changes. This fixed value is then taken as the best solution.
 
 The input LC is cleaned through Guassian Process `mod.clean_lc_gp()`. Those outliers are rejected from the fitting process and marke d as orange crosses in `mod.plot_lc()`.
 
@@ -77,9 +91,7 @@ The method `mod.correct_temp_comb()` is implemented to account for the possible 
 
 ## Test Case
 
-See file `test.py`.
-
-In this test case, I use `mod.cal_res_curve_test()` instead of `mod.cal_res_curve()` to save some time. A full iteration over mass-ratio could be time-consuming, thus only 10 mass-ratio values are calculated here.
+See file `test.py` and `test_rv.py`.
 
 You can use `mod.print_info()` to check the best-fitting parameters. The output figure for this test case is in `test/output.pdf` (using `mod.cal_res_curve()`).
 
