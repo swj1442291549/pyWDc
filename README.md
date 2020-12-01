@@ -102,5 +102,7 @@ The reason we implement error handling here is because sometiems WD code cannot 
 
 If you cannot get any result from `mod.cal_res_curve()`, please feel free to increase the `alarm_time` parameter. It controls how long the code should run until it feels like something goes wrong. The optimum value of `alarm_time` depends both on your data and the machine.
 
+If you don't use *V* band photometry, be sure to change `mod.cal_bc()` method to the correct one. 
+
 ## Attirubtion
 Please cite [Sun, Chen, Deng & de Grijs (2020)](https://iopscience.iop.org/article/10.3847/1538-4365/ab7894) if you find this code useful in your research.
